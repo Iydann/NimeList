@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
 import 'detail_screen.dart';
 
-class MyListScreen extends StatelessWidget {
+class MyListScreen extends StatefulWidget {
   const MyListScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final List<Map<String, String>> myAnime = [
-      {'title': 'Frieren', 'score': '9.1', 'status': 'Finished Airing'},
-      {'title': 'One Piece', 'score': '8.7', 'status': 'Currently Airing'},
-    ];
+  State<MyListScreen> createState() => _MyListScreenState();
+}
 
+class _MyListScreenState extends State<MyListScreen> {
+  final List<Map<String, String>> _myAnime = [
+    {'title': 'Frieren', 'score': '9.1', 'status': 'Finished Airing'},
+    {'title': 'One Piece', 'score': '8.7', 'status': 'Currently Airing'},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('My List')),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: myAnime.length,
+        itemCount: _myAnime.length,
         itemBuilder: (context, index) {
-          final anime = myAnime[index];
+          final anime = _myAnime[index];
 
           return Card(
             child: ListTile(
@@ -27,7 +32,14 @@ class MyListScreen extends StatelessWidget {
               ),
               title: Text(anime['title']!),
               subtitle: Text('★ ${anime['score']}'),
-              trailing: const Icon(Icons.chevron_right),
+              trailing: IconButton(
+                icon: const Icon(Icons.delete_outline),
+                onPressed: () {
+                  setState(() {
+                    _myAnime.removeAt(index);
+                  });
+                },
+              ),
               onTap: () {
                 Navigator.push(
                   context,

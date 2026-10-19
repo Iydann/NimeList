@@ -4,7 +4,9 @@ import 'home_screen.dart';
 import 'my_list_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final String userName;
+
+  const MainScreen({super.key, required this.userName});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -13,16 +15,16 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = const [
-    HomeScreen(),
-    DiscoverScreen(),
-    MyListScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final pages = [
+      HomeScreen(userName: widget.userName),
+      DiscoverScreen(userName: widget.userName),
+      MyListScreen(userName: widget.userName),
+    ];
+
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) {

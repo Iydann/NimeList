@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'detail_screen.dart';
 
 class DiscoverScreen extends StatefulWidget {
-  const DiscoverScreen({super.key});
+  final String userName;
+
+  const DiscoverScreen({super.key, required this.userName});
 
   @override
   State<DiscoverScreen> createState() => _DiscoverScreenState();
@@ -64,6 +66,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             title: anime['title']!,
                             score: anime['score']!,
                             status: anime['status']!,
+                            userName: widget.userName,
                           ),
                         ),
                       );

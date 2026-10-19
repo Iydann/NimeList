@@ -1,61 +1,64 @@
 import 'package:flutter/material.dart';
+import '../favorite_data.dart';
 import 'detail_screen.dart';
 
 class MyListScreen extends StatefulWidget {
-  const MyListScreen({super.key});
+  final String userName;
+
+  const MyListScreen({super.key, required this.userName});
 
   @override
   State<MyListScreen> createState() => _MyListScreenState();
 }
 
 class _MyListScreenState extends State<MyListScreen> {
-  final List<Map<String, String>> _myAnime = [
-    {'title': 'Frieren', 'score': '9.1', 'status': 'Finished Airing'},
-    {'title': 'One Piece', 'score': '8.7', 'status': 'Currently Airing'},
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('My List')),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _myAnime.length,
-        itemBuilder: (context, index) {
-          final anime = _myAnime[index];
+      body: myAnimeList.isEmpty
+          ? const Center(child: Text('My List masih kosong'))
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: myAnimeList.length,
+              itemBuilder: (context, index) {
+                final anime = myAnimeList[index];
 
-          return Card(
-            child: ListTile(
-              leading: Container(
-                width: 50,
-                color: Colors.blueGrey.shade700,
-              ),
-              title: Text(anime['title']!),
-              subtitle: Text('★ ${anime['score']}'),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete_outline),
-                onPressed: () {
-                  setState(() {
-                    _myAnime.removeAt(index);
-                  });
-                },
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DetailScreen(
-                      title: anime['title']!,
-                      score: anime['score']!,
-                      status: anime['status']!,
+                return Card(
+                  child: ListTile(
+                    leading: Container(
+                      width: 50,
+                      color: Colors.blueGrey.shade700,
                     ),
+                    title: Text(anime['title']!),
+                    subtitle: Text('★ ${anime['score']}'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: () {
+                        setState(() {
+                          myAnimeList.removeAt(index);
+                        });
+                      },
+                    ),
+                    onTap: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailScreen(
+                            title: anime['title']!,
+                            score: anime['score']!,
+                            status: anime['status']!,
+                            userName: widget.userName,
+                          ),
+                        ),
+                      );
+
+                      setState(() {});
+                    },
                   ),
                 );
               },
             ),
-          );
-        },
-      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../favorite_data.dart';
 import 'detail_screen.dart';
 
@@ -15,7 +16,10 @@ class _MyListScreenState extends State<MyListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('My List')),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Text('My List'),
+      ),
       body: myAnimeList.isEmpty
           ? const Center(child: Text('My List masih kosong'))
           : ListView.builder(
@@ -26,10 +30,7 @@ class _MyListScreenState extends State<MyListScreen> {
 
                 return Card(
                   child: ListTile(
-                    leading: Container(
-                      width: 50,
-                      color: Colors.blueGrey.shade700,
-                    ),
+                    leading: Container(width: 50, color: Colors.grey.shade200),
                     title: Text(anime['title']!),
                     subtitle: Text('★ ${anime['score']}'),
                     trailing: IconButton(

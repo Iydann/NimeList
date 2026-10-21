@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../favorite_data.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -23,10 +24,7 @@ class _DetailScreenState extends State<DetailScreen> {
   final TextEditingController _commentController = TextEditingController();
 
   final List<Map<String, String>> _comments = [
-    {
-      'name': 'NimeList User',
-      'content': 'Alurnya seru bet',
-    },
+    {'name': 'NimeList User', 'content': 'Alurnya seru bet'},
   ];
 
   @override
@@ -41,8 +39,20 @@ class _DetailScreenState extends State<DetailScreen> {
       (anime) => anime['title'] == widget.title,
     );
 
+    final buttonStyle = ElevatedButton.styleFrom(
+      backgroundColor: Colors.cyan.shade100,
+      foregroundColor: Colors.black87,
+    );
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Anime Detail')),
+      appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text('Anime Detail'),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -52,17 +62,14 @@ class _DetailScreenState extends State<DetailScreen> {
               width: double.infinity,
               height: 260,
               decoration: BoxDecoration(
-                color: Colors.blueGrey.shade700,
+                color: Colors.grey.shade200,
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
             const SizedBox(height: 16),
             Text(
               widget.title,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text('Score: ${widget.score}'),
@@ -82,6 +89,7 @@ class _DetailScreenState extends State<DetailScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
+                style: buttonStyle,
                 onPressed: () {
                   setState(() {
                     if (isFavorite) {
@@ -118,6 +126,8 @@ class _DetailScreenState extends State<DetailScreen> {
             Row(
               children: [
                 CircleAvatar(
+                  backgroundColor: Colors.grey.shade200,
+                  foregroundColor: Colors.black87,
                   child: Text(widget.userName[0].toUpperCase()),
                 ),
                 const SizedBox(width: 10),
@@ -126,7 +136,6 @@ class _DetailScreenState extends State<DetailScreen> {
                     controller: _commentController,
                     decoration: const InputDecoration(
                       hintText: 'Tulis komentar...',
-                      border: OutlineInputBorder(),
                     ),
                   ),
                 ),
@@ -136,15 +145,13 @@ class _DetailScreenState extends State<DetailScreen> {
             Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton(
+                style: buttonStyle,
                 onPressed: () {
                   final text = _commentController.text.trim();
 
                   if (text.isNotEmpty) {
                     setState(() {
-                      _comments.add({
-                        'name': widget.userName,
-                        'content': text,
-                      });
+                      _comments.add({'name': widget.userName, 'content': text});
                     });
                     _commentController.clear();
                   }
@@ -165,9 +172,14 @@ class _DetailScreenState extends State<DetailScreen> {
                 return Card(
                   child: ListTile(
                     leading: CircleAvatar(
+                      backgroundColor: Colors.grey.shade200,
+                      foregroundColor: Colors.black87,
                       child: Text(comment['name']![0].toUpperCase()),
                     ),
-                    title: Text(comment['name']!),
+                    title: Text(
+                      comment['name']!,
+                      style: const TextStyle(color: Colors.black87),
+                    ),
                     subtitle: Text(comment['content']!),
                     trailing: isMyComment
                         ? IconButton(

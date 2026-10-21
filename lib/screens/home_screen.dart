@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,31 +26,19 @@ class _HomeScreenState extends State<HomeScreen> {
     await Future.delayed(const Duration(seconds: 2));
 
     return [
-      {
-        'title': 'Frieren',
-        'score': '9.1',
-        'status': 'Finished Airing',
-      },
-      {
-        'title': 'One Piece',
-        'score': '8.7',
-        'status': 'Currently Airing',
-      },
-      {
-        'title': 'Jujutsu Kaisen',
-        'score': '8.6',
-        'status': 'Finished Airing',
-      },
-      {
-        'title': 'Solo Leveling',
-        'score': '8.8',
-        'status': 'Finished Airing',
-      },
+      {'title': 'Frieren', 'score': '9.1', 'status': 'Finished Airing'},
+      {'title': 'One Piece', 'score': '8.7', 'status': 'Currently Airing'},
+      {'title': 'Jujutsu Kaisen', 'score': '8.6', 'status': 'Finished Airing'},
+      {'title': 'Solo Leveling', 'score': '8.8', 'status': 'Finished Airing'},
     ];
   }
 
   Future<void> _loadAnime() async {
     final data = await _getAnime();
+
+    if (!mounted) {
+      return;
+    }
 
     setState(() {
       _animeList = data;
@@ -61,7 +50,23 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('NimeList'),
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/Icon.png',
+                width: 32,
+                height: 32,
+                excludeFromSemantics: true,
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Text('NimeList'),
+          ],
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -72,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.blue.shade900,
+                color: Colors.cyan.shade100,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Column(
@@ -80,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text(
                     'Featured Anime',
-                    style: TextStyle(fontSize: 14),
+                    style: TextStyle(fontSize: 14, color: Colors.black54),
                   ),
                   SizedBox(height: 6),
                   Text(
@@ -88,6 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
                   ),
                 ],
@@ -106,11 +112,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemCount: _animeList.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 0.75,
-                      ),
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 0.75,
+                          ),
                       itemBuilder: (context, index) {
                         final anime = _animeList[index];
 
@@ -135,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Container(
                                   width: double.infinity,
                                   decoration: BoxDecoration(
-                                    color: Colors.blueGrey.shade700,
+                                    color: Colors.grey.shade200,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),

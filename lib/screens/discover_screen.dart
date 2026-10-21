@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'detail_screen.dart';
 
 class DiscoverScreen extends StatefulWidget {
@@ -27,7 +28,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Discover')),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Text('Discover'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -36,7 +40,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
               decoration: const InputDecoration(
                 hintText: 'Search anime...',
                 prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
               ),
               onChanged: (value) {
                 setState(() {
@@ -78,7 +81,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                           child: Container(
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              color: Colors.blueGrey.shade700,
+                              color: Colors.grey.shade200,
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),

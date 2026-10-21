@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../favorite_data.dart';
+import '../widgets/anime_poster.dart';
 import 'detail_screen.dart';
 
 class MyListScreen extends StatefulWidget {
@@ -30,7 +31,7 @@ class _MyListScreenState extends State<MyListScreen> {
 
                 return Card(
                   child: ListTile(
-                    leading: Container(width: 50, color: Colors.grey.shade200),
+                    leading: const AnimePoster(width: 50, borderRadius: 0),
                     title: Text(anime['title']!),
                     subtitle: Text('★ ${anime['score']}'),
                     trailing: IconButton(

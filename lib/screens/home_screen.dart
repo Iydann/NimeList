@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/anime_grid.dart';
+import '../widgets/app_logo.dart';
 import 'detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -51,20 +53,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Row(
+        title: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                'assets/Icon.png',
-                width: 32,
-                height: 32,
-                excludeFromSemantics: true,
-              ),
-            ),
-            const SizedBox(width: 10),
-            const Text('NimeList'),
+            AppLogo(excludeFromSemantics: true),
+            SizedBox(width: 10),
+            Text('NimeList'),
           ],
         ),
       ),
@@ -108,55 +102,18 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : GridView.builder(
-                      itemCount: _animeList.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 0.75,
-                          ),
-                      itemBuilder: (context, index) {
-                        final anime = _animeList[index];
-
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DetailScreen(
-                                  title: anime['title']!,
-                                  score: anime['score']!,
-                                  status: anime['status']!,
-                                  userName: widget.userName,
-                                ),
-                              ),
-                            );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                anime['title']!,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text('★ ${anime['score']}'),
-                            ],
+                  : AnimeGrid(
+                      animeList: _animeList,
+                      onAnimeTap: (anime) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailScreen(
+                              title: anime['title']!,
+                              score: anime['score']!,
+                              status: anime['status']!,
+                              userName: widget.userName,
+                            ),
                           ),
                         );
                       },

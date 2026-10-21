@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/app_logo.dart';
 import 'main_screen.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -17,15 +18,7 @@ class LoginScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: Image.asset(
-                      'assets/Icon.png',
-                      width: 112,
-                      height: 112,
-                      semanticLabel: 'Logo NimeList',
-                    ),
-                  ),
+                  const AppLogo(size: 112, borderRadius: 24),
                   const SizedBox(height: 20),
                   const Text(
                     'NimeList',

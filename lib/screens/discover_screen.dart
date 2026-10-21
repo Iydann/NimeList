@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/anime_grid.dart';
+import '../widgets/app_text_field.dart';
 import 'detail_screen.dart';
 
 class DiscoverScreen extends StatefulWidget {
@@ -36,11 +38,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            TextField(
-              decoration: const InputDecoration(
-                hintText: 'Search anime...',
-                prefixIcon: Icon(Icons.search),
-              ),
+            AppTextField(
+              hintText: 'Search anime...',
+              prefixIcon: Icons.search,
               onChanged: (value) {
                 setState(() {
                   _search = value;
@@ -49,52 +49,18 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: GridView.builder(
-                itemCount: filteredAnime.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.75,
-                ),
-                itemBuilder: (context, index) {
-                  final anime = filteredAnime[index];
-
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DetailScreen(
-                            title: anime['title']!,
-                            score: anime['score']!,
-                            status: anime['status']!,
-                            userName: widget.userName,
-                          ),
-                        ),
-                      );
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          anime['title']!,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text('★ ${anime['score']}'),
-                      ],
+              child: AnimeGrid(
+                animeList: filteredAnime,
+                onAnimeTap: (anime) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailScreen(
+                        title: anime['title']!,
+                        score: anime['score']!,
+                        status: anime['status']!,
+                        userName: widget.userName,
+                      ),
                     ),
                   );
                 },

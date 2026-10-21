@@ -22,7 +22,7 @@ class AnimeCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Expanded(child: AnimePoster()),
-          const SizedBox(height: 6),
+          const SizedBox(height: 16),
           Text(
             title,
             maxLines: 1,

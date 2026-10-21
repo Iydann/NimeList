@@ -63,7 +63,7 @@ class _DetailScreenState extends State<DetailScreen> {
               widget.title,
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
             Text('Score: ${widget.score}'),
             Text('Status: ${widget.status}'),
             const SizedBox(height: 16),
@@ -71,11 +71,11 @@ class _DetailScreenState extends State<DetailScreen> {
               'Sinopsis',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 16),
             const Text(
               'Deskripsi anime masih menggunakan data dummy untuk sementara.',
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
             // Tombol favorit berubah sesuai status anime.
             SizedBox(
@@ -103,17 +103,17 @@ class _DetailScreenState extends State<DetailScreen> {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             const Text(
               'Komentar',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
 
             Row(
               children: [
                 UserAvatar(name: widget.userName),
-                const SizedBox(width: 10),
+                const SizedBox(width: 16),
                 Expanded(
                   child: AppTextField(
                     controller: _commentController,
@@ -122,7 +122,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
             Align(
               alignment: Alignment.centerRight,
               child: AppButton(
@@ -139,7 +139,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 },
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
 
             ListView.builder(
               shrinkWrap: true,

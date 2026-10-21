@@ -19,18 +19,18 @@ class LoginScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const AppLogo(size: 112, borderRadius: 24),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   const Text(
                     'NimeList',
                     style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 16),
                   const Text(
                     'Temukan dan simpan anime favoritmu.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.black54),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(

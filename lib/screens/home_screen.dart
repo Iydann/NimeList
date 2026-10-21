@@ -59,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             AppLogo(excludeFromSemantics: true),
-            SizedBox(width: 10),
+            SizedBox(width: 16),
             Text('NimeList'),
           ],
         ),
@@ -83,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     'Featured Anime',
                     style: TextStyle(fontSize: 14, color: Colors.black54),
                   ),
-                  SizedBox(height: 6),
+                  SizedBox(height: 16),
                   Text(
                     'Temukan anime favoritmu',
                     style: TextStyle(
@@ -95,12 +95,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             const Text(
               'Popular Anime',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())

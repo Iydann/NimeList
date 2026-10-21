@@ -25,7 +25,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Simulasi mengambil data dari API.
   Future<List<Map<String, String>>> _getAnime() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(
+      const Duration(seconds: 1),
+    ); // Simulasi delay untuk mengambil data
 
     return [
       {'title': 'Frieren', 'score': '9.1', 'status': 'Finished Airing'},

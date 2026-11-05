@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 
+import '../models/anime.dart';
+import '../services/anime_service.dart';
+import '../widgets/anime_feedback.dart';
 import '../widgets/anime_grid.dart';
 import '../widgets/app_logo.dart';
 import 'detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userName;
+  final AnimeService animeService;
 
-  const HomeScreen({super.key, required this.userName});
+  const HomeScreen({
+    super.key,
+    required this.userName,
+    required this.animeService,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -15,7 +23,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = true;
-  List<Map<String, String>> _animeList = [];
+  String? _error;
+  List<Anime> _animeList = [];
 
   @override
   void initState() {
@@ -23,31 +32,59 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadAnime();
   }
 
-  // Simulasi mengambil data dari API.
-  Future<List<Map<String, String>>> _getAnime() async {
-    await Future.delayed(
-      const Duration(seconds: 1),
-    ); // Simulasi delay untuk mengambil data
-
-    return [
-      {'title': 'Frieren', 'score': '9.1', 'status': 'Finished Airing'},
-      {'title': 'One Piece', 'score': '8.7', 'status': 'Currently Airing'},
-      {'title': 'Jujutsu Kaisen', 'score': '8.6', 'status': 'Finished Airing'},
-      {'title': 'Solo Leveling', 'score': '8.8', 'status': 'Finished Airing'},
-    ];
+  Future<void> _loadAnime() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    try {
+      final data = await widget.animeService.getPopularAnime();
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _animeList = data;
+        _isLoading = false;
+      });
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _error = error is AnimeApiException
+            ? error.message
+            : 'Gagal memuat anime. Silakan coba lagi.';
+        _isLoading = false;
+      });
+    }
   }
 
-  Future<void> _loadAnime() async {
-    final data = await _getAnime();
-
-    if (!mounted) {
-      return;
+  Widget _buildAnimeList() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
     }
-
-    setState(() {
-      _animeList = data;
-      _isLoading = false;
-    });
+    final error = _error;
+    if (error != null) {
+      return AnimeFeedback(message: error, onRetry: _loadAnime);
+    }
+    if (_animeList.isEmpty) {
+      return const AnimeFeedback(message: 'Belum ada anime untuk ditampilkan');
+    }
+    return AnimeGrid(
+      animeList: _animeList,
+      onAnimeTap: (anime) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailScreen(
+              anime: anime,
+              userName: widget.userName,
+              animeService: widget.animeService,
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -101,26 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : AnimeGrid(
-                      animeList: _animeList,
-                      onAnimeTap: (anime) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DetailScreen(
-                              title: anime['title']!,
-                              score: anime['score']!,
-                              status: anime['status']!,
-                              userName: widget.userName,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-            ),
+            Expanded(child: _buildAnimeList()),
           ],
         ),
       ),

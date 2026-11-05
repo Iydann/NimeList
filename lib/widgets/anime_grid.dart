@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../models/anime.dart';
 import 'anime_card.dart';
 
 class AnimeGrid extends StatelessWidget {
-  final List<Map<String, String>> animeList;
-  final ValueChanged<Map<String, String>> onAnimeTap;
+  final List<Anime> animeList;
+  final ValueChanged<Anime> onAnimeTap;
 
   const AnimeGrid({
     super.key,
@@ -26,8 +27,9 @@ class AnimeGrid extends StatelessWidget {
         final anime = animeList[index];
 
         return AnimeCard(
-          title: anime['title']!,
-          score: anime['score']!,
+          title: anime.title,
+          score: anime.scoreText,
+          imageUrl: anime.imageUrl,
           onTap: () {
             onAnimeTap(anime);
           },

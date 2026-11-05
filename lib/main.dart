@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 
 import 'screens/login_screen.dart';
+import 'services/anime_service.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final AnimeService? animeService;
+
+  const MyApp({super.key, this.animeService});
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +55,7 @@ class MyApp extends StatelessWidget {
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(28)),
         ),
       ),
-      home: const LoginScreen(),
+      home: LoginScreen(animeService: animeService),
     );
   }
 }

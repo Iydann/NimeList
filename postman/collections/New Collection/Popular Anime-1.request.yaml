@@ -1,0 +1,6 @@
+$kind: http-request
+name: Popular Anime
+url: ""
+method: GET
+settings: {}
+order: 1000

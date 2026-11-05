@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../widgets/app_logo.dart';
+import '../services/anime_service.dart';
 import 'main_screen.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+  final AnimeService? animeService;
+
+  const LoginScreen({super.key, this.animeService});
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +42,10 @@ class LoginScreen extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                const MainScreen(userName: 'Abdullah'),
+                            builder: (context) => MainScreen(
+                              userName: 'Abdullah',
+                              animeService: animeService,
+                            ),
                           ),
                         );
                       },

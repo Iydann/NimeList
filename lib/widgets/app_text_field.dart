@@ -5,6 +5,8 @@ class AppTextField extends StatelessWidget {
   final IconData? prefixIcon;
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
+  final TextInputAction? textInputAction;
 
   const AppTextField({
     super.key,
@@ -12,6 +14,8 @@ class AppTextField extends StatelessWidget {
     this.prefixIcon,
     this.controller,
     this.onChanged,
+    this.onSubmitted,
+    this.textInputAction,
   });
 
   @override
@@ -19,6 +23,8 @@ class AppTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       onChanged: onChanged,
+      onSubmitted: onSubmitted,
+      textInputAction: textInputAction,
       decoration: InputDecoration(
         hintText: hintText,
         prefixIcon: prefixIcon == null ? null : Icon(prefixIcon),

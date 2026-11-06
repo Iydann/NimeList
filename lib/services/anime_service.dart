@@ -35,7 +35,7 @@ class AnimeService {
       return pending;
     }
 
-    // Home dan Discover berbagi hasil selama sesi aplikasi berjalan.
+
     final request = _getAnimeList('top/anime', {
       'filter': 'bypopularity',
       'limit': '10',

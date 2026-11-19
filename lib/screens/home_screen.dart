@@ -4,7 +4,6 @@ import '../models/anime.dart';
 import '../services/anime_service.dart';
 import '../widgets/anime_feedback.dart';
 import '../widgets/anime_grid.dart';
-import '../widgets/app_logo.dart';
 import 'detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -39,17 +38,13 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     try {
       final data = await widget.animeService.getPopularAnime();
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       setState(() {
         _animeList = data;
         _isLoading = false;
       });
     } catch (error) {
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       setState(() {
         _error = error is AnimeApiException
             ? error.message
@@ -63,9 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    final error = _error;
-    if (error != null) {
-      return AnimeFeedback(message: error, onRetry: _loadAnime);
+    if (_error != null) {
+      return AnimeFeedback(message: _error!, onRetry: _loadAnime);
     }
     if (_animeList.isEmpty) {
       return const AnimeFeedback(message: 'Belum ada anime untuk ditampilkan');
@@ -91,13 +85,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Row(
-          mainAxisSize: MainAxisSize.min,
+        title: Row(
+          spacing: 16,
           children: [
-            AppLogo(excludeFromSemantics: true),
-            SizedBox(width: 16),
-            Text('NimeList'),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/Icon.png',
+                width: 32,
+                height: 32,
+                excludeFromSemantics: true,
+              ),
+            ),
+            const Text('NimeList'),
           ],
         ),
       ),
@@ -105,6 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 16,
           children: [
             Container(
               width: double.infinity,
@@ -115,12 +116,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 16,
                 children: [
                   Text(
                     'Featured Anime',
                     style: TextStyle(fontSize: 14, color: Colors.black54),
                   ),
-                  SizedBox(height: 16),
                   Text(
                     'Temukan anime favoritmu',
                     style: TextStyle(
@@ -132,12 +133,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
             const Text(
               'Popular Anime',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16),
             Expanded(child: _buildAnimeList()),
           ],
         ),

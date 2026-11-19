@@ -33,8 +33,6 @@ class AnimePoster extends StatelessWidget {
             ? placeholder
             : Image.network(
                 url,
-                width: width,
-                height: height,
                 fit: BoxFit.cover,
                 semanticLabel: 'Poster anime',
                 loadingBuilder: (context, child, loadingProgress) {

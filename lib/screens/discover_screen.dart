@@ -6,7 +6,6 @@ import '../models/anime.dart';
 import '../services/anime_service.dart';
 import '../widgets/anime_feedback.dart';
 import '../widgets/anime_grid.dart';
-import '../widgets/app_text_field.dart';
 import 'detail_screen.dart';
 
 class DiscoverScreen extends StatefulWidget {
@@ -45,22 +44,22 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   void _onSearchChanged(String value) {
     final query = value.trim();
-    if (query == _search) {
-      return;
-    }
+    if (query == _search) return;
+
     _debounce?.cancel();
     _search = query;
+    if (query.isEmpty) {
+      _loadAnime();
+      return;
+    }
+
     // Abaikan respons lama segera setelah kata pencarian berubah.
     _requestVersion++;
     setState(() {
       _isLoading = true;
       _error = null;
     });
-    if (query.isEmpty) {
-      _loadAnime();
-    } else {
-      _debounce = Timer(const Duration(milliseconds: 500), _loadAnime);
-    }
+    _debounce = Timer(const Duration(milliseconds: 500), _loadAnime);
   }
 
   void _onSearchSubmitted(String value) {
@@ -80,17 +79,13 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       final data = query.isEmpty
           ? await widget.animeService.getPopularAnime()
           : await widget.animeService.searchAnime(query);
-      if (!mounted || version != _requestVersion) {
-        return;
-      }
+      if (!mounted || version != _requestVersion) return;
       setState(() {
         _animeList = data;
         _isLoading = false;
       });
     } catch (error) {
-      if (!mounted || version != _requestVersion) {
-        return;
-      }
+      if (!mounted || version != _requestVersion) return;
       setState(() {
         _error = error is AnimeApiException
             ? error.message
@@ -104,9 +99,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    final error = _error;
-    if (error != null) {
-      return AnimeFeedback(message: error, onRetry: _loadAnime);
+    if (_error != null) {
+      return AnimeFeedback(message: _error!, onRetry: _loadAnime);
     }
     if (_animeList.isEmpty) {
       return const AnimeFeedback(message: 'Anime tidak ditemukan');
@@ -131,22 +125,21 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text('Discover'),
-      ),
+      appBar: AppBar(title: const Text('Discover')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
+          spacing: 16,
           children: [
-            AppTextField(
-              hintText: 'Search anime...',
-              prefixIcon: Icons.search,
-              textInputAction: TextInputAction.search,
+            TextField(
               onChanged: _onSearchChanged,
               onSubmitted: _onSearchSubmitted,
+              textInputAction: TextInputAction.search,
+              decoration: const InputDecoration(
+                hintText: 'Search anime...',
+                prefixIcon: Icon(Icons.search),
+              ),
             ),
-            const SizedBox(height: 16),
             Expanded(child: _buildResults()),
           ],
         ),

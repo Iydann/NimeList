@@ -44,7 +44,12 @@ class MyApp extends StatelessWidget {
           color: Colors.white,
           surfaceTintColor: Colors.transparent,
         ),
-        // Gaya input dipakai bersama oleh pencarian dan komentar.
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.cyan.shade100,
+            foregroundColor: Colors.black87,
+          ),
+        ),
         inputDecorationTheme: InputDecorationThemeData(
           filled: true,
           fillColor: Colors.grey.shade50,

@@ -5,9 +5,6 @@ import '../models/anime.dart';
 import '../services/anime_service.dart';
 import '../widgets/anime_feedback.dart';
 import '../widgets/anime_poster.dart';
-import '../widgets/app_button.dart';
-import '../widgets/app_text_field.dart';
-import '../widgets/user_avatar.dart';
 
 class DetailScreen extends StatefulWidget {
   final Anime anime;
@@ -50,9 +47,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
     try {
       final anime = await widget.animeService.getAnimeDetail(widget.anime.id);
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
 
       setState(() {
         _anime = anime;
@@ -66,20 +61,14 @@ class _DetailScreenState extends State<DetailScreen> {
           myAnimeList[favoriteIndex] = anime;
         }
       });
-    } on AnimeApiException catch (error) {
-      if (mounted) {
-        setState(() {
-          _errorMessage = error.message;
-          _isLoading = false;
-        });
-      }
-    } catch (_) {
-      if (mounted) {
-        setState(() {
-          _errorMessage = 'Detail anime belum bisa dimuat. Silakan coba lagi.';
-          _isLoading = false;
-        });
-      }
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = error is AnimeApiException
+            ? error.message
+            : 'Detail anime belum bisa dimuat. Silakan coba lagi.';
+        _isLoading = false;
+      });
     }
   }
 
@@ -89,17 +78,20 @@ class _DetailScreenState extends State<DetailScreen> {
     super.dispose();
   }
 
+  Widget _buildAvatar(String name) {
+    final trimmed = name.trim();
+    final initial = trimmed.isEmpty ? '?' : trimmed[0].toUpperCase();
+    return CircleAvatar(
+      backgroundColor: Colors.grey.shade200,
+      foregroundColor: Colors.black87,
+      child: Text(initial),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: const Text('Anime Detail'),
-      ),
+      appBar: AppBar(title: const Text('Anime Detail')),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
@@ -110,75 +102,72 @@ class _DetailScreenState extends State<DetailScreen> {
 
   Widget _buildDetails(Anime anime) {
     final isFavorite = myAnimeList.any((item) => item.id == anime.id);
-    final synopsis = anime.synopsis?.trim();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: 16,
         children: [
           AnimePoster(imageUrl: anime.imageUrl, height: 260, borderRadius: 12),
-          const SizedBox(height: 16),
           Text(
             anime.title,
             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 16),
-          Text('Score: ${anime.scoreText}'),
-          Text('Status: ${anime.status}'),
-          const SizedBox(height: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Score: ${anime.scoreText}'),
+              Text('Status: ${anime.status}'),
+            ],
+          ),
           const Text(
             'Sinopsis',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 16),
           Text(
-            synopsis == null || synopsis.isEmpty
-                ? 'Sinopsis belum tersedia.'
-                : synopsis,
+            anime.synopsis?.isNotEmpty == true
+                ? anime.synopsis!
+                : 'Sinopsis belum tersedia.',
           ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: AppButton(
-              onPressed: () {
-                setState(() {
-                  if (isFavorite) {
-                    myAnimeList.removeWhere((item) => item.id == anime.id);
-                  } else {
-                    myAnimeList.add(anime);
-                  }
-                });
-              },
-              icon: isFavorite
+          ElevatedButton.icon(
+            onPressed: () {
+              setState(() {
+                if (isFavorite) {
+                  myAnimeList.removeWhere((item) => item.id == anime.id);
+                } else {
+                  myAnimeList.add(anime);
+                }
+              });
+            },
+            icon: Icon(
+              isFavorite
                   ? Icons.bookmark_remove_outlined
                   : Icons.bookmark_add_outlined,
-              label: isFavorite ? 'Remove from My List' : 'Add to My List',
             ),
+            label: Text(isFavorite ? 'Remove from My List' : 'Add to My List'),
           ),
-          const SizedBox(height: 16),
           const Text(
             'Komentar',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 16),
           Row(
+            spacing: 16,
             children: [
-              UserAvatar(name: widget.userName),
-              const SizedBox(width: 16),
+              _buildAvatar(widget.userName),
               Expanded(
-                child: AppTextField(
+                child: TextField(
                   controller: _commentController,
-                  hintText: 'Tulis komentar...',
+                  decoration: const InputDecoration(
+                    hintText: 'Tulis komentar...',
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
           Align(
             alignment: Alignment.centerRight,
-            child: AppButton(
-              label: 'Post Comment',
+            child: ElevatedButton(
               onPressed: () {
                 final text = _commentController.text.trim();
                 if (text.isNotEmpty) {
@@ -188,38 +177,28 @@ class _DetailScreenState extends State<DetailScreen> {
                   _commentController.clear();
                 }
               },
+              child: const Text('Post Comment'),
             ),
           ),
-          const SizedBox(height: 16),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _comments.length,
-            itemBuilder: (context, index) {
-              final comment = _comments[index];
-              final isMyComment = comment['name'] == widget.userName;
-
-              return Card(
-                child: ListTile(
-                  leading: UserAvatar(name: comment['name']!),
-                  title: Text(
-                    comment['name']!,
-                    style: const TextStyle(color: Colors.black87),
+          Column(
+            children: [
+              for (var i = 0; i < _comments.length; i++)
+                Card(
+                  child: ListTile(
+                    leading: _buildAvatar(_comments[i]['name']!),
+                    title: Text(_comments[i]['name']!),
+                    subtitle: Text(_comments[i]['content']!),
+                    trailing: _comments[i]['name'] == widget.userName
+                        ? IconButton(
+                            icon: const Icon(Icons.delete_outline),
+                            onPressed: () {
+                              setState(() => _comments.removeAt(i));
+                            },
+                          )
+                        : null,
                   ),
-                  subtitle: Text(comment['content']!),
-                  trailing: isMyComment
-                      ? IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          onPressed: () {
-                            setState(() {
-                              _comments.removeAt(index);
-                            });
-                          },
-                        )
-                      : null,
                 ),
-              );
-            },
+            ],
           ),
         ],
       ),

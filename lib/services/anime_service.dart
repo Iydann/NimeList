@@ -26,15 +26,8 @@ class AnimeService {
   }) : _client = client ?? http.Client();
 
   Future<List<Anime>> getPopularAnime() async {
-    final cached = _popularAnime;
-    if (cached != null) {
-      return cached;
-    }
-    final pending = _popularRequest;
-    if (pending != null) {
-      return pending;
-    }
-
+    if (_popularAnime != null) return _popularAnime!;
+    if (_popularRequest != null) return _popularRequest!;
 
     final request = _getAnimeList('top/anime', {
       'filter': 'bypopularity',

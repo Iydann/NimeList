@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/anime.dart';
-import 'anime_card.dart';
+import 'anime_poster.dart';
 
 class AnimeGrid extends StatelessWidget {
   final List<Anime> animeList;
@@ -26,13 +26,27 @@ class AnimeGrid extends StatelessWidget {
       itemBuilder: (context, index) {
         final anime = animeList[index];
 
-        return AnimeCard(
-          title: anime.title,
-          score: anime.scoreText,
-          imageUrl: anime.imageUrl,
-          onTap: () {
-            onAnimeTap(anime);
-          },
+        return GestureDetector(
+          onTap: () => onAnimeTap(anime),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 16,
+            children: [
+              Expanded(child: AnimePoster(imageUrl: anime.imageUrl)),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    anime.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text('★ ${anime.scoreText}'),
+                ],
+              ),
+            ],
+          ),
         );
       },
     );

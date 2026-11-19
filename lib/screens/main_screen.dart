@@ -29,14 +29,18 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final pages = [
-      HomeScreen(userName: widget.userName, animeService: _animeService),
-      DiscoverScreen(userName: widget.userName, animeService: _animeService),
-      MyListScreen(userName: widget.userName, animeService: _animeService),
-    ];
-
     return Scaffold(
-      body: pages[_selectedIndex],
+      body: switch (_selectedIndex) {
+        0 => HomeScreen(userName: widget.userName, animeService: _animeService),
+        1 => DiscoverScreen(
+          userName: widget.userName,
+          animeService: _animeService,
+        ),
+        _ => MyListScreen(
+          userName: widget.userName,
+          animeService: _animeService,
+        ),
+      },
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) {

@@ -23,10 +23,7 @@ class _MyListScreenState extends State<MyListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text('My List'),
-      ),
+      appBar: AppBar(title: const Text('My List')),
       body: myAnimeList.isEmpty
           ? const Center(child: Text('My List masih kosong'))
           : ListView.builder(

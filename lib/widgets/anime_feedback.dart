@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'app_button.dart';
-
 class AnimeFeedback extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
@@ -15,12 +13,14 @@ class AnimeFeedback extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          spacing: 16,
           children: [
             Text(message, textAlign: TextAlign.center),
-            if (onRetry != null) ...[
-              const SizedBox(height: 16),
-              AppButton(label: 'Coba lagi', onPressed: onRetry!),
-            ],
+            if (onRetry != null)
+              ElevatedButton(
+                onPressed: onRetry,
+                child: const Text('Coba lagi'),
+              ),
           ],
         ),
       ),

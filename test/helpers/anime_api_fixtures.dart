@@ -8,12 +8,14 @@ Map<String, dynamic> animeJson({
   int id = 52991,
   String title = 'Frieren',
   num? score = 9.1,
+  String? rating = 'PG-13 - Teens 13 or older',
   String? synopsis = defaultSynopsis,
 }) => {
   'mal_id': id,
   'title': title,
   'score': score,
   'status': 'Finished Airing',
+  'rating': rating,
   'images': {
     'jpg': {'image_url': null},
   },

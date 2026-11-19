@@ -33,6 +33,7 @@ class AnimeService {
       'filter': 'bypopularity',
       'limit': '10',
       'page': '1',
+      'sfw': 'true',
     });
     _popularRequest = request;
     try {
@@ -49,7 +50,12 @@ class AnimeService {
     if (search.isEmpty) {
       return getPopularAnime();
     }
-    return _getAnimeList('anime', {'q': search, 'limit': '10', 'page': '1'});
+    return _getAnimeList('anime', {
+      'q': search,
+      'limit': '10',
+      'page': '1',
+      'sfw': 'true',
+    });
   }
 
   Future<Anime> getAnimeDetail(int id) async {
@@ -57,11 +63,18 @@ class AnimeService {
     if (data is! Map<String, dynamic>) {
       throw const AnimeApiException('Data detail anime tidak valid.');
     }
+    final Anime anime;
     try {
-      return Anime.fromJson(data);
+      anime = Anime.fromJson(data);
     } on FormatException {
       throw const AnimeApiException('Data detail anime tidak valid.');
     }
+    if (!anime.isSfw) {
+      throw const AnimeApiException(
+        'Anime ini dibatasi oleh filter konten aman (SFW).',
+      );
+    }
+    return anime;
   }
 
   Future<List<Anime>> _getAnimeList(
@@ -73,12 +86,15 @@ class AnimeService {
       throw const AnimeApiException('Data daftar anime tidak valid.');
     }
     try {
-      return data.map((item) {
-        if (item is! Map<String, dynamic>) {
-          throw const FormatException('Data anime tidak valid.');
-        }
-        return Anime.fromJson(item);
-      }).toList();
+      return data
+          .map((item) {
+            if (item is! Map<String, dynamic>) {
+              throw const FormatException('Data anime tidak valid.');
+            }
+            return Anime.fromJson(item);
+          })
+          .where((anime) => anime.isSfw)
+          .toList();
     } on FormatException {
       throw const AnimeApiException('Data daftar anime tidak valid.');
     }

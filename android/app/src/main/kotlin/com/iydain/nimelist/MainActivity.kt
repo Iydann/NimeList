@@ -1,4 +1,4 @@
-package com.example.nime_list
+package com.iydain.nimelist
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -35,4 +35,22 @@ void main() {
     final json = animeJson()..remove('mal_id');
     expect(() => Anime.fromJson(json), throwsFormatException);
   });
+
+  test('SFW check blocks Rx and R+ ratings and allows general ratings', () {
+    expect(Anime.fromJson(animeJson(rating: 'G - All Ages')).isSfw, isTrue);
+    expect(
+      Anime.fromJson(animeJson(rating: 'PG-13 - Teens 13 or older')).isSfw,
+      isTrue,
+    );
+    expect(
+      Anime.fromJson(animeJson(rating: 'R - 17+ (violence & profanity)')).isSfw,
+      isTrue,
+    );
+    expect(Anime.fromJson(animeJson(rating: null)).isSfw, isTrue);
+    expect(
+      Anime.fromJson(animeJson(rating: 'R+ - Mild Nudity')).isSfw,
+      isFalse,
+    );
+    expect(Anime.fromJson(animeJson(rating: 'Rx - Hentai')).isSfw, isFalse);
+  });
 }

@@ -3,6 +3,7 @@ class Anime {
   final String title;
   final double? score;
   final String status;
+  final String? rating;
   final String? imageUrl;
   final String? synopsis;
 
@@ -11,6 +12,7 @@ class Anime {
     required this.title,
     this.score,
     required this.status,
+    this.rating,
     this.imageUrl,
     this.synopsis,
   });
@@ -36,12 +38,19 @@ class Anime {
       title: title,
       score: (score as num?)?.toDouble(),
       status: _optionalText(json['status']) ?? 'Status belum tersedia',
+      rating: _optionalText(json['rating']),
       imageUrl: _optionalText(imageUrl),
       synopsis: _optionalText(json['synopsis']),
     );
   }
 
   String get scoreText => score?.toString() ?? 'N/A';
+
+  bool get isSfw {
+    final normalized = rating?.toLowerCase();
+    if (normalized == null) return true;
+    return !normalized.startsWith('rx') && !normalized.startsWith('r+');
+  }
 
   static String? _optionalText(Object? value) {
     if (value is! String || value.trim().isEmpty) {

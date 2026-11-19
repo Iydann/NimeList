@@ -39,35 +39,28 @@ class LoginScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.black54),
                   ),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MainScreen(
-                            userName: 'Abdullah',
-                            animeService: animeService,
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(6),
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MainScreen(
+                              userName: 'Abdullah',
+                              animeService: animeService,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF1F1F1F),
-                      minimumSize: const Size(double.infinity, 52),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: const BorderSide(color: Color(0xFFDADCE0)),
+                        );
+                      },
+                      child: Image.asset(
+                        'assets/google_signin_button.png',
+                        width: 216,
+                        height: 48,
+                        semanticLabel: 'Sign in with Google',
                       ),
                     ),
-                    icon: Image.asset(
-                      'assets/google_logo.png',
-                      width: 20,
-                      height: 20,
-                      excludeFromSemantics: true,
-                    ),
-                    label: const Text('Login dengan Google'),
                   ),
                 ],
               ),

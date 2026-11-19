@@ -21,6 +21,7 @@ void main() {
             'filter': 'bypopularity',
             'limit': '10',
             'page': '1',
+            'sfw': 'true',
           });
           return animeListResponse(popularAnimeJson());
         }),
@@ -43,6 +44,7 @@ void main() {
           expect(request.url.queryParameters['q'], 'Frieren & 魔法');
           expect(request.url.queryParameters['limit'], '10');
           expect(request.url.queryParameters['page'], '1');
+          expect(request.url.queryParameters['sfw'], 'true');
           return animeListResponse([animeJson()]);
         }),
       );
@@ -150,5 +152,45 @@ void main() {
       throwsA(isA<AnimeApiException>()),
     );
     pendingResponse.complete(animeListResponse([]));
+  });
+
+  test('SFW filter drops R+ and Rx entries from list responses', () async {
+    final service = AnimeService(
+      client: MockClient(
+        (_) async => animeListResponse([
+          animeJson(
+            id: 1,
+            title: 'Safe Anime',
+            rating: 'PG-13 - Teens 13 or older',
+          ),
+          animeJson(id: 2, title: 'Ecchi Anime', rating: 'R+ - Mild Nudity'),
+          animeJson(id: 3, title: 'Adult Anime', rating: 'Rx - Hentai'),
+        ]),
+      ),
+    );
+    addTearDown(service.close);
+
+    final results = await service.searchAnime('test');
+    expect(results.map((anime) => anime.title), ['Safe Anime']);
+  });
+
+  test('Detail blocks NSFW anime even when requested by ID', () async {
+    final service = AnimeService(
+      client: MockClient(
+        (_) async => jsonResponse({
+          'data': animeJson(
+            id: 99,
+            title: 'Adult Anime',
+            rating: 'Rx - Hentai',
+          ),
+        }),
+      ),
+    );
+    addTearDown(service.close);
+
+    await expectLater(
+      service.getAnimeDetail(99),
+      throwsA(isA<AnimeApiException>()),
+    );
   });
 }

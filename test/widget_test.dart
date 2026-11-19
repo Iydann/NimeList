@@ -28,7 +28,7 @@ AnimeService testService([
 
 Future<void> openMain(WidgetTester tester, AnimeService service) async {
   await tester.pumpWidget(MyApp(animeService: service));
-  await tester.tap(find.text('Login dengan Google'));
+  await tester.tap(find.bySemanticsLabel('Sign in with Google'));
   await tester.pumpAndSettle();
 }
 
@@ -93,7 +93,7 @@ void main() {
       final pendingResponse = Completer<http.Response>();
       final service = testService((_) => pendingResponse.future);
       await tester.pumpWidget(MyApp(animeService: service));
-      await tester.tap(find.text('Login dengan Google'));
+      await tester.tap(find.bySemanticsLabel('Sign in with Google'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
       expect(find.byType(CircularProgressIndicator), findsOneWidget);

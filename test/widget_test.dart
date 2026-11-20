@@ -4,17 +4,109 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:nime_list/favorite_data.dart';
 import 'package:nime_list/main.dart';
 import 'package:nime_list/models/anime.dart';
+import 'package:nime_list/models/anime_comment.dart';
+import 'package:nime_list/models/app_user.dart';
 import 'package:nime_list/screens/detail_screen.dart';
 import 'package:nime_list/screens/discover_screen.dart';
 import 'package:nime_list/screens/home_screen.dart';
 import 'package:nime_list/screens/login_screen.dart';
 import 'package:nime_list/screens/main_screen.dart';
 import 'package:nime_list/services/anime_service.dart';
+import 'package:nime_list/services/nimelist_repository.dart';
 
 import 'helpers/anime_api_fixtures.dart';
+
+const testUser = AppUser(userId: 1, googleId: 'google-123', name: 'Abdullah');
+
+class FakeNimeListRepository implements NimeListRepository {
+  AppUser? _user;
+  final List<Anime> favorites;
+  final Map<int, List<AnimeComment>> _comments = {};
+  int _nextCommentId = 1;
+
+  FakeNimeListRepository({List<Anime>? initialFavorites, AppUser? signedInUser})
+    : favorites = List<Anime>.of(
+        initialFavorites ??
+            [
+              const Anime(
+                id: 52991,
+                title: 'Frieren',
+                score: 9.1,
+                status: 'Finished Airing',
+              ),
+              const Anime(
+                id: 21,
+                title: 'One Piece',
+                score: 8.7,
+                status: 'Currently Airing',
+              ),
+            ],
+      ),
+      _user = signedInUser;
+
+  @override
+  AppUser? get currentUser => _user;
+
+  @override
+  Future<AppUser?> restoreSession() async => _user;
+
+  @override
+  Future<AppUser?> signInWithGoogle() async {
+    _user = testUser;
+    return _user;
+  }
+
+  @override
+  Future<void> signOut() async {
+    _user = null;
+  }
+
+  @override
+  Future<List<Anime>> getFavorites() async => List<Anime>.of(favorites);
+
+  @override
+  Future<bool> isFavorite(int externalAnimeId) async =>
+      favorites.any((anime) => anime.id == externalAnimeId);
+
+  @override
+  Future<void> addFavorite(Anime anime) async {
+    favorites.removeWhere((item) => item.id == anime.id);
+    favorites.insert(0, anime);
+  }
+
+  @override
+  Future<void> removeFavorite(int externalAnimeId) async {
+    favorites.removeWhere((item) => item.id == externalAnimeId);
+  }
+
+  @override
+  Future<List<AnimeComment>> getComments(int externalAnimeId) async =>
+      List<AnimeComment>.of(_comments[externalAnimeId] ?? const []);
+
+  @override
+  Future<AnimeComment> addComment(Anime anime, String content) async {
+    final user = _user ?? testUser;
+    final comment = AnimeComment(
+      id: _nextCommentId++,
+      userId: user.userId,
+      userName: user.name,
+      userAvatarUrl: user.avatarUrl,
+      content: content.trim(),
+      createdAt: DateTime.now(),
+    );
+    _comments.putIfAbsent(anime.id, () => []).insert(0, comment);
+    return comment;
+  }
+
+  @override
+  Future<void> deleteComment(int commentId) async {
+    for (final list in _comments.values) {
+      list.removeWhere((comment) => comment.id == commentId);
+    }
+  }
+}
 
 AnimeService testService([
   Future<http.Response> Function(http.Request)? handler,
@@ -26,10 +118,16 @@ AnimeService testService([
   return service;
 }
 
-Future<void> openMain(WidgetTester tester, AnimeService service) async {
-  await tester.pumpWidget(MyApp(animeService: service));
+Future<FakeNimeListRepository> openMain(
+  WidgetTester tester,
+  AnimeService service, {
+  FakeNimeListRepository? repository,
+}) async {
+  final repo = repository ?? FakeNimeListRepository();
+  await tester.pumpWidget(MyApp(animeService: service, repository: repo));
   await tester.tap(find.bySemanticsLabel('Sign in with Google'));
   await tester.pumpAndSettle();
+  return repo;
 }
 
 Future<void> selectTab(WidgetTester tester, IconData icon) async {
@@ -43,15 +141,6 @@ Future<void> selectTab(WidgetTester tester, IconData icon) async {
 }
 
 void main() {
-  setUp(() {
-    final originalFavorites = List<Anime>.of(myAnimeList);
-    addTearDown(() {
-      myAnimeList
-        ..clear()
-        ..addAll(originalFavorites);
-    });
-  });
-
   testWidgets('Login is replaced and API detail returns to the selected tab', (
     tester,
   ) async {
@@ -92,10 +181,12 @@ void main() {
     (tester) async {
       final pendingResponse = Completer<http.Response>();
       final service = testService((_) => pendingResponse.future);
-      await tester.pumpWidget(MyApp(animeService: service));
+      final repo = FakeNimeListRepository();
+      await tester.pumpWidget(MyApp(animeService: service, repository: repo));
       await tester.tap(find.bySemanticsLabel('Sign in with Google'));
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump();
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
       await tester.tap(
@@ -113,10 +204,10 @@ void main() {
     },
   );
 
-  testWidgets('API search, favorites by ID, and local comments work together', (
+  testWidgets('API search, favorites by ID, and comments work via repository', (
     tester,
   ) async {
-    await openMain(tester, testService());
+    final repo = await openMain(tester, testService());
     await selectTab(tester, Icons.search);
     await tester.enterText(find.byType(TextField), 'Solo');
     await tester.pump(const Duration(milliseconds: 500));
@@ -133,7 +224,7 @@ void main() {
     await tester.tap(find.text('Add to My List'));
     await tester.pumpAndSettle();
     expect(find.text('Remove from My List'), findsOneWidget);
-    expect(myAnimeList.any((anime) => anime.id == 52299), isTrue);
+    expect(repo.favorites.any((anime) => anime.id == 52299), isTrue);
 
     await tester.ensureVisible(find.byType(TextField));
     await tester.pumpAndSettle();
@@ -180,8 +271,48 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Solo Leveling'), findsNothing);
-    expect(myAnimeList.any((anime) => anime.id == 52299), isFalse);
+    expect(repo.favorites.any((anime) => anime.id == 52299), isFalse);
   });
+
+  testWidgets(
+    'Logout signs out user, returns to LoginScreen, and re-login works',
+    (tester) async {
+      final repo = await openMain(tester, testService());
+      expect(repo.currentUser, isNotNull);
+
+      await tester.tap(find.byIcon(Icons.logout));
+      await tester.pumpAndSettle();
+
+      expect(repo.currentUser, isNull);
+      expect(find.byType(LoginScreen), findsOneWidget);
+
+      await tester.tap(find.bySemanticsLabel('Sign in with Google'));
+      await tester.pumpAndSettle();
+
+      expect(repo.currentUser, isNotNull);
+      expect(find.byType(MainScreen), findsOneWidget);
+      expect(find.text('Frieren'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'Logout does not pass MainScreen-owned closed AnimeService to LoginScreen',
+    (tester) async {
+      final repo = FakeNimeListRepository(signedInUser: testUser);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MainScreen(user: testUser, repository: repo),
+        ),
+      );
+      await tester.pump();
+
+      await tester.tap(find.byIcon(Icons.logout));
+      await tester.pumpAndSettle();
+
+      final loginScreen = tester.widget<LoginScreen>(find.byType(LoginScreen));
+      expect(loginScreen.animeService, isNull);
+    },
+  );
 
   testWidgets('Home displays an API error and retries successfully', (
     tester,
@@ -195,15 +326,19 @@ void main() {
     });
     await tester.pumpWidget(
       MaterialApp(
-        home: HomeScreen(userName: 'Abdullah', animeService: service),
+        home: HomeScreen(
+          user: testUser,
+          repository: FakeNimeListRepository(signedInUser: testUser),
+          animeService: service,
+        ),
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Coba lagi'), findsOneWidget);
-    await tester.tap(find.text('Coba lagi'));
+    expect(find.text('Try Again'), findsOneWidget);
+    await tester.tap(find.text('Try Again'));
     await tester.pumpAndSettle();
     expect(find.text('Frieren'), findsOneWidget);
-    expect(find.text('Coba lagi'), findsNothing);
+    expect(find.text('Try Again'), findsNothing);
     expect(attempts, 2);
   });
 
@@ -213,11 +348,15 @@ void main() {
     final service = testService((_) async => animeListResponse([]));
     await tester.pumpWidget(
       MaterialApp(
-        home: HomeScreen(userName: 'Abdullah', animeService: service),
+        home: HomeScreen(
+          user: testUser,
+          repository: FakeNimeListRepository(signedInUser: testUser),
+          animeService: service,
+        ),
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Belum ada anime untuk ditampilkan'), findsOneWidget);
+    expect(find.text('No anime available to display.'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
   });
 
@@ -234,7 +373,11 @@ void main() {
       });
       await tester.pumpWidget(
         MaterialApp(
-          home: DiscoverScreen(userName: 'Abdullah', animeService: service),
+          home: DiscoverScreen(
+            user: testUser,
+            repository: FakeNimeListRepository(signedInUser: testUser),
+            animeService: service,
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -248,14 +391,14 @@ void main() {
       await tester.pump(const Duration(milliseconds: 1));
       await tester.pumpAndSettle();
       expect(queries, ['Frieren']);
-      expect(find.text('Anime tidak ditemukan'), findsOneWidget);
+      expect(find.text('No anime found.'), findsOneWidget);
 
       await tester.enterText(find.byType(TextField), '   ');
       await tester.pump(const Duration(milliseconds: 500));
       await tester.pumpAndSettle();
       expect(queries, ['Frieren']);
       expect(find.text('Frieren'), findsOneWidget);
-      expect(find.text('Anime tidak ditemukan'), findsNothing);
+      expect(find.text('No anime found.'), findsNothing);
     },
   );
 
@@ -272,7 +415,11 @@ void main() {
     });
     await tester.pumpWidget(
       MaterialApp(
-        home: DiscoverScreen(userName: 'Abdullah', animeService: service),
+        home: DiscoverScreen(
+          user: testUser,
+          repository: FakeNimeListRepository(signedInUser: testUser),
+          animeService: service,
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -307,16 +454,50 @@ void main() {
       MaterialApp(
         home: DetailScreen(
           anime: Anime.fromJson(animeJson()),
-          userName: 'Abdullah',
+          user: testUser,
+          repository: FakeNimeListRepository(signedInUser: testUser),
           animeService: service,
         ),
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Coba lagi'), findsOneWidget);
-    await tester.tap(find.text('Coba lagi'));
+    expect(find.text('Try Again'), findsOneWidget);
+    await tester.tap(find.text('Try Again'));
     await tester.pumpAndSettle();
     expect(find.text(defaultSynopsis), findsOneWidget);
     expect(attempts, 2);
+  });
+
+  testWidgets('Detail separates [Written by MAL Rewrite] into a Chip badge', (
+    tester,
+  ) async {
+    final service = testService(
+      (_) async => jsonResponse({
+        'data': animeJson(
+          synopsis: 'Clean story body.\n\n[Written by MAL Rewrite]',
+        ),
+      }),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: DetailScreen(
+          anime: Anime.fromJson(animeJson()),
+          user: testUser,
+          repository: FakeNimeListRepository(signedInUser: testUser),
+          animeService: service,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Clean story body.'), findsOneWidget);
+    expect(find.textContaining('[Written by MAL Rewrite]'), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byType(Chip),
+        matching: find.text('MAL Rewrite'),
+      ),
+      findsOneWidget,
+    );
   });
 }

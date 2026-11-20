@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nime_list/models/anime.dart';
+import 'package:nime_list/models/anime_comment.dart';
+import 'package:nime_list/models/app_user.dart';
 
 import 'helpers/anime_api_fixtures.dart';
 
@@ -15,6 +17,7 @@ void main() {
     expect(anime.title, 'Shingeki no Kyojin');
     expect(anime.score, 8.58);
     expect(anime.status, 'Finished Airing');
+    expect(anime.genre, 'Adventure, Fantasy');
     expect(anime.imageUrl, 'https://example.com/poster.jpg');
     expect(anime.synopsis, defaultSynopsis);
   });
@@ -52,5 +55,50 @@ void main() {
       isFalse,
     );
     expect(Anime.fromJson(animeJson(rating: 'Rx - Hentai')).isSfw, isFalse);
+  });
+
+  test('Synopsis separates trailing MAL Rewrite and Source attributions', () {
+    final malAnime = Anime.fromJson(
+      animeJson(
+        synopsis: 'An elf mage journeys north.\n\n[Written by MAL Rewrite]',
+      ),
+    );
+    expect(malAnime.synopsisBody, 'An elf mage journeys north.');
+    expect(malAnime.synopsisSource, 'MAL Rewrite');
+
+    final sourceAnime = Anime.fromJson(
+      animeJson(synopsis: 'A young hunter levels up.\n\n(Source: Crunchyroll)'),
+    );
+    expect(sourceAnime.synopsisBody, 'A young hunter levels up.');
+    expect(sourceAnime.synopsisSource, 'Crunchyroll');
+
+    final plainAnime = Anime.fromJson(
+      animeJson(synopsis: 'Plain synopsis without attribution.'),
+    );
+    expect(plainAnime.synopsisBody, 'Plain synopsis without attribution.');
+    expect(plainAnime.synopsisSource, isNull);
+  });
+
+  test('AppUser and AnimeComment parse Google avatar URLs', () {
+    final user = AppUser.fromJson({
+      'user_id': 1,
+      'google_id': 'g-123',
+      'name': 'Iydain',
+      'avatar_url': 'https://lh3.googleusercontent.com/a/avatar',
+    });
+    expect(user.avatarUrl, 'https://lh3.googleusercontent.com/a/avatar');
+
+    final comment = AnimeComment.fromJson({
+      'comment_id': 10,
+      'user_id': 1,
+      'content': 'Great episode!',
+      'created_at': '2026-11-20T00:00:00Z',
+      'users': {
+        'name': 'Iydain',
+        'avatar_url': 'https://lh3.googleusercontent.com/a/avatar',
+      },
+    });
+    expect(comment.userName, 'Iydain');
+    expect(comment.userAvatarUrl, 'https://lh3.googleusercontent.com/a/avatar');
   });
 }

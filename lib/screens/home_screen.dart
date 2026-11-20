@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
 
 import '../models/anime.dart';
+import '../models/app_user.dart';
 import '../services/anime_service.dart';
+import '../services/nimelist_repository.dart';
 import '../widgets/anime_feedback.dart';
 import '../widgets/anime_grid.dart';
+import '../widgets/user_avatar.dart';
 import 'detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  final String userName;
+  final AppUser user;
+  final NimeListRepository repository;
   final AnimeService animeService;
+  final VoidCallback? onLogout;
 
   const HomeScreen({
     super.key,
-    required this.userName,
+    required this.user,
+    required this.repository,
     required this.animeService,
+    this.onLogout,
   });
 
   @override
@@ -48,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _error = error is AnimeApiException
             ? error.message
-            : 'Gagal memuat anime. Silakan coba lagi.';
+            : 'Failed to load anime. Please try again.';
         _isLoading = false;
       });
     }
@@ -62,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return AnimeFeedback(message: _error!, onRetry: _loadAnime);
     }
     if (_animeList.isEmpty) {
-      return const AnimeFeedback(message: 'Belum ada anime untuk ditampilkan');
+      return const AnimeFeedback(message: 'No anime available to display.');
     }
     return AnimeGrid(
       animeList: _animeList,
@@ -72,7 +79,8 @@ class _HomeScreenState extends State<HomeScreen> {
           MaterialPageRoute(
             builder: (context) => DetailScreen(
               anime: anime,
-              userName: widget.userName,
+              user: widget.user,
+              repository: widget.repository,
               animeService: widget.animeService,
             ),
           ),
@@ -100,6 +108,14 @@ class _HomeScreenState extends State<HomeScreen> {
             const Text('NimeList'),
           ],
         ),
+        actions: [
+          if (widget.onLogout != null)
+            IconButton(
+              icon: const Icon(Icons.logout),
+              tooltip: 'Logout',
+              onPressed: widget.onLogout,
+            ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -114,20 +130,35 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.cyan.shade100,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 spacing: 16,
                 children: [
-                  Text(
-                    'Featured Anime',
-                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                  UserAvatar(
+                    name: widget.user.name,
+                    imageUrl: widget.user.avatarUrl,
+                    size: 44,
                   ),
-                  Text(
-                    'Temukan anime favoritmu',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 4,
+                      children: [
+                        Text(
+                          'Hello, ${widget.user.name}',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54,
+                          ),
+                        ),
+                        const Text(
+                          'Discover your favorite anime',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

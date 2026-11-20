@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-const defaultSynopsis = 'Sinopsis dari API untuk pengujian.';
+const defaultSynopsis = 'Sample anime synopsis from API for testing.';
 
 Map<String, dynamic> animeJson({
   int id = 52991,
@@ -16,6 +16,10 @@ Map<String, dynamic> animeJson({
   'score': score,
   'status': 'Finished Airing',
   'rating': rating,
+  'genres': [
+    {'name': 'Adventure'},
+    {'name': 'Fantasy'},
+  ],
   'images': {
     'jpg': {'image_url': null},
   },

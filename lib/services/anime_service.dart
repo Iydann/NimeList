@@ -61,17 +61,17 @@ class AnimeService {
   Future<Anime> getAnimeDetail(int id) async {
     final data = await _getData('anime/$id');
     if (data is! Map<String, dynamic>) {
-      throw const AnimeApiException('Data detail anime tidak valid.');
+      throw const AnimeApiException('Invalid anime detail data.');
     }
     final Anime anime;
     try {
       anime = Anime.fromJson(data);
     } on FormatException {
-      throw const AnimeApiException('Data detail anime tidak valid.');
+      throw const AnimeApiException('Invalid anime detail data.');
     }
     if (!anime.isSfw) {
       throw const AnimeApiException(
-        'Anime ini dibatasi oleh filter konten aman (SFW).',
+        'This anime is restricted by the Safe For Work (SFW) filter.',
       );
     }
     return anime;
@@ -83,20 +83,20 @@ class AnimeService {
   ) async {
     final data = await _getData(path, query: query);
     if (data is! List) {
-      throw const AnimeApiException('Data daftar anime tidak valid.');
+      throw const AnimeApiException('Invalid anime list data.');
     }
     try {
       return data
           .map((item) {
             if (item is! Map<String, dynamic>) {
-              throw const FormatException('Data anime tidak valid.');
+              throw const FormatException('Invalid anime data.');
             }
             return Anime.fromJson(item);
           })
           .where((anime) => anime.isSfw)
           .toList();
     } on FormatException {
-      throw const AnimeApiException('Data daftar anime tidak valid.');
+      throw const AnimeApiException('Invalid anime list data.');
     }
   }
 
@@ -111,33 +111,33 @@ class AnimeService {
         final wait = int.tryParse(response.headers['retry-after'] ?? '');
         throw AnimeApiException(
           wait == null
-              ? 'Terlalu banyak permintaan. Tunggu sebentar lalu coba lagi.'
-              : 'Terlalu banyak permintaan. Coba lagi dalam $wait detik.',
+              ? 'Too many requests. Please wait a moment and try again.'
+              : 'Too many requests. Try again in $wait seconds.',
         );
       }
       if (response.statusCode != 200) {
         throw AnimeApiException(
           response.statusCode == 404
-              ? 'Anime tidak ditemukan.'
-              : 'Gagal memuat anime. Silakan coba lagi.',
+              ? 'Anime not found.'
+              : 'Failed to load anime. Please try again.',
         );
       }
 
       final json = jsonDecode(utf8.decode(response.bodyBytes));
       if (json is! Map<String, dynamic> || !json.containsKey('data')) {
-        throw const FormatException('Respons API tidak valid.');
+        throw const FormatException('Invalid API response.');
       }
       return json['data'];
     } on TimeoutException {
       throw const AnimeApiException(
-        'Koneksi terlalu lama. Periksa internet lalu coba lagi.',
+        'Connection timed out. Please check your internet and try again.',
       );
     } on http.ClientException {
       throw const AnimeApiException(
-        'Tidak dapat terhubung. Periksa koneksi internetmu.',
+        'Unable to connect. Please check your internet connection.',
       );
     } on FormatException {
-      throw const AnimeApiException('Respons server tidak dapat dibaca.');
+      throw const AnimeApiException('Unable to read server response.');
     }
   }
 

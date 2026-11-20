@@ -3,18 +3,22 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../models/anime.dart';
+import '../models/app_user.dart';
 import '../services/anime_service.dart';
+import '../services/nimelist_repository.dart';
 import '../widgets/anime_feedback.dart';
 import '../widgets/anime_grid.dart';
 import 'detail_screen.dart';
 
 class DiscoverScreen extends StatefulWidget {
-  final String userName;
+  final AppUser user;
+  final NimeListRepository repository;
   final AnimeService animeService;
 
   const DiscoverScreen({
     super.key,
-    required this.userName,
+    required this.user,
+    required this.repository,
     required this.animeService,
   });
 
@@ -89,7 +93,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       setState(() {
         _error = error is AnimeApiException
             ? error.message
-            : 'Gagal mencari anime. Silakan coba lagi.';
+            : 'Failed to search anime. Please try again.';
         _isLoading = false;
       });
     }
@@ -103,7 +107,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       return AnimeFeedback(message: _error!, onRetry: _loadAnime);
     }
     if (_animeList.isEmpty) {
-      return const AnimeFeedback(message: 'Anime tidak ditemukan');
+      return const AnimeFeedback(message: 'No anime found.');
     }
     return AnimeGrid(
       animeList: _animeList,
@@ -113,7 +117,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           MaterialPageRoute(
             builder: (context) => DetailScreen(
               anime: anime,
-              userName: widget.userName,
+              user: widget.user,
+              repository: widget.repository,
               animeService: widget.animeService,
             ),
           ),

@@ -19,7 +19,7 @@ class AnimeFeedback extends StatelessWidget {
             if (onRetry != null)
               ElevatedButton(
                 onPressed: onRetry,
-                child: const Text('Coba lagi'),
+                child: const Text('Try Again'),
               ),
           ],
         ),

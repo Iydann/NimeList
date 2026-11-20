@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 
+import '../models/app_user.dart';
 import '../services/anime_service.dart';
+import '../services/nimelist_repository.dart';
 import 'discover_screen.dart';
 import 'home_screen.dart';
+import 'login_screen.dart';
 import 'my_list_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  final String userName;
+  final AppUser user;
+  final NimeListRepository repository;
   final AnimeService? animeService;
 
-  const MainScreen({super.key, required this.userName, this.animeService});
+  const MainScreen({
+    super.key,
+    required this.user,
+    required this.repository,
+    this.animeService,
+  });
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -27,17 +36,44 @@ class _MainScreenState extends State<MainScreen> {
     super.dispose();
   }
 
+  Future<void> _logout() async {
+    try {
+      await widget.repository.signOut();
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginScreen(
+            animeService: widget.animeService,
+            repository: widget.repository,
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Sign-out failed: $error')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: switch (_selectedIndex) {
-        0 => HomeScreen(userName: widget.userName, animeService: _animeService),
+        0 => HomeScreen(
+          user: widget.user,
+          repository: widget.repository,
+          animeService: _animeService,
+          onLogout: _logout,
+        ),
         1 => DiscoverScreen(
-          userName: widget.userName,
+          user: widget.user,
+          repository: widget.repository,
           animeService: _animeService,
         ),
         _ => MyListScreen(
-          userName: widget.userName,
+          user: widget.user,
+          repository: widget.repository,
           animeService: _animeService,
         ),
       },

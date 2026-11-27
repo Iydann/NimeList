@@ -13,6 +13,7 @@ import 'package:nime_list/screens/discover_screen.dart';
 import 'package:nime_list/screens/home_screen.dart';
 import 'package:nime_list/screens/login_screen.dart';
 import 'package:nime_list/screens/main_screen.dart';
+import 'package:nime_list/screens/privacy_policy_screen.dart';
 import 'package:nime_list/services/anime_service.dart';
 import 'package:nime_list/services/nimelist_repository.dart';
 
@@ -499,5 +500,32 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('Privacy Policy can be opened from LoginScreen and HomeScreen', (
+    tester,
+  ) async {
+    final repo = FakeNimeListRepository();
+    await tester.pumpWidget(
+      MyApp(animeService: testService(), repository: repo),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Privacy Policy'));
+    await tester.pumpAndSettle();
+    expect(find.byType(PrivacyPolicyScreen), findsOneWidget);
+    expect(find.text('NimeList Privacy Policy'), findsOneWidget);
+
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    expect(find.byType(LoginScreen), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel('Sign in with Google'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.privacy_tip_outlined));
+    await tester.pumpAndSettle();
+    expect(find.byType(PrivacyPolicyScreen), findsOneWidget);
+    expect(find.text('1. Information We Collect'), findsOneWidget);
   });
 }

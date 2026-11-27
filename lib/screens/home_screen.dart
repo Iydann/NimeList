@@ -8,6 +8,7 @@ import '../widgets/anime_feedback.dart';
 import '../widgets/anime_grid.dart';
 import '../widgets/user_avatar.dart';
 import 'detail_screen.dart';
+import 'privacy_policy_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final AppUser user;
@@ -109,6 +110,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.privacy_tip_outlined),
+            tooltip: 'Privacy Policy',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PrivacyPolicyScreen(),
+                ),
+              );
+            },
+          ),
           if (widget.onLogout != null)
             IconButton(
               icon: const Icon(Icons.logout),

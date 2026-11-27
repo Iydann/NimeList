@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account &amp; Data Deletion — NimeList</title>
+  <style>
+    :root {
+      --bg: #e0f7fa;
+      --surface: #ffffff;
+      --primary: #006064;
+      --primary-soft: #e0f2f1;
+      --text: #1f2937;
+      --muted: #4b5563;
+      --border: #e5e7eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 32px 20px 64px;
+    }
+    .card {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 36px;
+      box-shadow: 0 4px 20px rgba(0, 96, 100, 0.08);
+    }
+    .badge {
+      display: inline-block;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      color: var(--primary);
+      font-size: 2rem;
+    }
+    h2 {
+      margin: 26px 0 10px;
+      color: var(--primary);
+      font-size: 1.2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+    p { margin: 0 0 12px; }
+    ol, ul {
+      margin: 0 0 14px;
+      padding-left: 22px;
+    }
+    li { margin-bottom: 8px; }
+    .button {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 12px 20px;
+      background: var(--primary);
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+    .button:hover { opacity: 0.92; }
+    .callout {
+      background: #f0fdff;
+      border-left: 4px solid var(--primary);
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+    a { color: var(--primary); }
+    footer {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    @media (max-width: 600px) {
+      .card { padding: 24px 18px; }
+      h1 { font-size: 1.65rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <article class="card">
+      <div class="badge">NimeList &middot; com.iydain.nimelist</div>
+      <h1>Account &amp; Data Deletion</h1>
+      <p>
+        Users of <strong>NimeList</strong> (developed by <strong>Iydain / Willy</strong>) can request the permanent
+        deletion of their account and all associated data at any time.
+      </p>
+
+      <h2>How to Request Account Deletion</h2>
+      <ol>
+        <li>
+          Send an email from the <strong>Google account email address</strong> you used to sign in to NimeList to
+          <a href="mailto:willy.iedans@gmail.com">willy.iedans@gmail.com</a>.
+        </li>
+        <li>Use the subject line: <code>NimeList Account Deletion Request</code>.</li>
+        <li>Include your display name in NimeList (optional, helps us verify faster) and state that you want your account and associated data permanently deleted.</li>
+      </ol>
+
+      <a
+        class="button"
+        href="mailto:willy.iedans@gmail.com?subject=NimeList%20Account%20Deletion%20Request&amp;body=Hello%20NimeList%20Developer%2C%0A%0APlease%20permanently%20delete%20my%20NimeList%20account%20and%20all%20associated%20data%20(profile%2C%20favorites%2C%20and%20comments)%20linked%20to%20this%20Google%20email%20address.%0A%0ADisplay%20Name%20(optional)%3A%20"
+      >
+        Send Deletion Request Email
+      </a>
+
+      <h2>What Data Will Be Deleted</h2>
+      <p>Once your request is verified, we permanently delete all data associated with your NimeList account from our Supabase backend:</p>
+      <ul>
+        <li>Your authentication account record (email address and auth user ID).</li>
+        <li>Your user profile record (display name, Google ID, and profile photo URL).</li>
+        <li>All anime saved in your <strong>My List</strong> (favorites).</li>
+        <li>All <strong>comments</strong> you posted on anime detail pages.</li>
+      </ul>
+
+      <h2>Processing Time &amp; Retention</h2>
+      <div class="callout">
+        All verified account deletion requests are processed within <strong>7 business days</strong>, and you will
+        receive a confirmation reply by email. No personal data is retained in our active database after deletion.
+        Automated infrastructure backups (if any) are automatically purged within 30 days according to standard hosting
+        backup rotation.
+      </div>
+
+      <h2>Delete Specific Data Without Deleting Your Account</h2>
+      <ul>
+        <li><strong>Remove favorites:</strong> Open the <em>My List</em> tab in NimeList and tap the delete icon next to any anime.</li>
+        <li><strong>Delete comments:</strong> Open the anime detail page where you commented and tap the delete icon on your comment.</li>
+        <li><strong>Disconnect Google Sign-In:</strong> You can also revoke NimeList's access anytime in your Google Account settings under <em>Security &rarr; Third-party apps &amp; services</em>.</li>
+      </ul>
+
+      <footer>
+        <a href="./index.html">&larr; Back to NimeList Legal</a> &nbsp;|&nbsp;
+        <a href="./privacy-policy.html">Privacy Policy</a>
+      </footer>
+    </article>
+  </main>
+</body>
+</html>

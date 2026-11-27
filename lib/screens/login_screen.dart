@@ -4,6 +4,7 @@ import '../models/app_user.dart';
 import '../services/anime_service.dart';
 import '../services/nimelist_repository.dart';
 import 'main_screen.dart';
+import 'privacy_policy_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final AnimeService? animeService;
@@ -118,6 +119,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PrivacyPolicyScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text('Privacy Policy'),
+                  ),
                 ],
               ),
             ),
